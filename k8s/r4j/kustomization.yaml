@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: exp-r4j
+
+resources:
+  - ../base
+
+patches:
+  - target:
+      kind: Deployment
+      name: service-a
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "service-a,r4j"
+  - target:
+      kind: Deployment
+      name: service-b
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "service-b,r4j"
+  - target:
+      kind: Deployment
+      name: service-c
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "service-c,r4j"

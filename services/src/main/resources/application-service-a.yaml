@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: service-a
+
+app:
+  stock-service:
+    url: ${APP_STOCK_SERVICE_URL:http://localhost:8081}

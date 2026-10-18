@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: service-b-vs
+spec:
+  hosts:
+    - service-b
+  http:
+    - route:
+        - destination:
+            host: service-b
+      timeout: 2s
+      retries:
+        attempts: 2
+        perTryTimeout: 500ms
+        retryOn: 5xx,reset,connect-failure,gateway-error
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: service-c-vs
+spec:
+  hosts:
+    - service-c
+  http:
+    - route:
+        - destination:
+            host: service-c
+      timeout: 2s
+      retries:
+        attempts: 2
+        perTryTimeout: 500ms
+        retryOn: 5xx,reset,connect-failure,gateway-error

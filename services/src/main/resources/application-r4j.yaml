@@ -1,0 +1,39 @@
+# Resilience4j configuration — active only with profile "r4j"
+# Per-try timeout: 500ms (set as HTTP client read timeout)
+app:
+  http:
+    read-timeout-ms: 500
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    metrics:
+      enabled: true
+    instances:
+      downstream:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
+        record-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+          - java.io.IOException
+  retry:
+    metrics:
+      enabled: true
+    instances:
+      downstream:
+        max-attempts: 3
+        wait-duration: 25ms
+        retry-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+          - java.io.IOException
