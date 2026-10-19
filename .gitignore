@@ -33,9 +33,6 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# Experiment results (keep structure, ignore data)
-results/*/
-
 # Python
 __pycache__/
 *.pyc

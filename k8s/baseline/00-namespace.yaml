@@ -1,0 +1,6 @@
+# Variante baseline: sem resiliência e sem sidecar (grupo de controle).
+# O prefixo "00-" faz este arquivo ser aplicado primeiro pelo "kubectl apply -f k8s/baseline/".
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: baseline

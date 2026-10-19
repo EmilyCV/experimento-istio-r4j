@@ -1,0 +1,58 @@
+# Job que roda o k6 UMA vez, dentro do cluster, no namespace da variante.
+#
+# Os valores entre __DOIS_SUBLINHADOS__ são trocados pelo rodar-variante.sh
+# antes de aplicar (com sed):
+#   __NOME__     nome do Job (ex.: k6-rep1)
+#   __VARIANTE__ baseline, r4j ou istio (gravado no resumo)
+#   __ROTULO__   rótulo gravado no resumo (ex.: rep1)
+#   __TAXA__     requisições por segundo
+#   __DURACAO__  duração da carga (ex.: 90s)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: __NOME__
+  labels:
+    app: k6
+spec:
+  # Se o k6 falhar, não tenta de novo: a repetição é refeita pelo script.
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: k6
+      annotations:
+        # O cliente de carga NUNCA tem sidecar, em nenhuma variante.
+        # Só importa no namespace istio, mas fica aqui para o Job ser igual em todas.
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:2.2.0
+          imagePullPolicy: IfNotPresent
+          args: ["run", "--quiet", "--no-color", "/scripts/teste.js"]
+          env:
+            - name: ALVO
+              value: "http://service-a:8080/api/a/"
+            - name: TAXA
+              value: "__TAXA__"
+            - name: DURACAO
+              value: "__DURACAO__"
+            - name: VARIANTE
+              value: "__VARIANTE__"
+            - name: ROTULO
+              value: "__ROTULO__"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: script-k6

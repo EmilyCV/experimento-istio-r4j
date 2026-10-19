@@ -1,0 +1,24 @@
+# VirtualService: RETRY e TIMEOUT das chamadas ao service-b.
+# Quem aplica é o sidecar do service-a (o lado que faz a chamada).
+# Equivalência com o Resilience4j: ver PARAMETROS.md.
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: service-b
+  namespace: istio
+spec:
+  hosts:
+    - service-b
+  http:
+    - route:
+        - destination:
+            host: service-b
+      # Timeout total da chamada, somando todas as tentativas.
+      timeout: 2s
+      retries:
+        # Tentativas EXTRAS (não conta a primeira): 1 + 2 = 3 no total.
+        attempts: 2
+        # Timeout de cada tentativa.
+        perTryTimeout: 500ms
+        # Repete em 5xx, conexão resetada ou falha de conexão; nunca em 4xx.
+        retryOn: 5xx,reset,connect-failure

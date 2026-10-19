@@ -1,0 +1,79 @@
+# ConfigMap com o script do k6 (o gerador de carga).
+# Não tem namespace fixo: o rodar-variante.sh aplica este arquivo no namespace
+# da variante (kubectl apply -n <variante> -f k8s/k6/script-k6.yaml).
+#
+# O script lê as configurações das variáveis de ambiente do Job (job-k6.yaml):
+#   ALVO     URL chamada (padrão: http://service-a:8080/api/a/)
+#   TAXA     requisições por segundo (padrão: 20)
+#   DURACAO  duração da carga, ex.: "90s" (padrão: 90s)
+#   VARIANTE baseline, r4j ou istio (só para identificar o resumo)
+#   ROTULO   nome da execução, ex.: "rep1" ou "aquecimento"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-k6
+data:
+  teste.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+
+    const ALVO = __ENV.ALVO || 'http://service-a:8080/api/a/';
+    const TAXA = parseInt(__ENV.TAXA || '20');
+    const DURACAO = __ENV.DURACAO || '90s';
+    const VARIANTE = __ENV.VARIANTE || 'desconhecida';
+    const ROTULO = __ENV.ROTULO || 'sem-rotulo';
+
+    export const options = {
+      // Estatísticas calculadas para a latência (http_req_duration).
+      summaryTrendStats: ['avg', 'min', 'med', 'p(95)', 'p(99)', 'max'],
+      scenarios: {
+        carga_constante: {
+          // Chegada constante: TAXA requisições por segundo, não importa
+          // quanto cada uma demore (o k6 abre mais usuários virtuais se precisar).
+          executor: 'constant-arrival-rate',
+          rate: TAXA,
+          timeUnit: '1s',
+          duration: DURACAO,
+          preAllocatedVUs: 20,
+          maxVUs: 100,
+        },
+      },
+    };
+
+    export default function () {
+      // Um id diferente a cada chamada (de 0 a 999).
+      const id = Math.floor(Math.random() * 1000);
+      const resposta = http.get(ALVO + id);
+      check(resposta, { 'status 200': (r) => r.status === 200 });
+    }
+
+    // Ao final, imprime um resumo em JSON entre marcadores, para o
+    // rodar-variante.sh conseguir separá-lo do resto do log.
+    export function handleSummary(data) {
+      const m = data.metrics;
+      const lat = m.http_req_duration.values;
+      const falhas = m.http_req_failed ? m.http_req_failed.values.rate : 0;
+      const resumo = {
+        variante: VARIANTE,
+        rotulo: ROTULO,
+        taxa_alvo_rps: TAXA,
+        duracao: DURACAO,
+        requisicoes: m.http_reqs.values.count,
+        taxa_real_rps: m.http_reqs.values.rate,
+        taxa_sucesso: 1 - falhas,
+        // Iterações que o k6 não conseguiu disparar no tempo certo.
+        // Deve ser 0; se não for, a taxa pedida não foi mantida.
+        iteracoes_descartadas: m.dropped_iterations ? m.dropped_iterations.values.count : 0,
+        latencia_ms: {
+          media: lat.avg,
+          minima: lat.min,
+          p50: lat.med,
+          p95: lat['p(95)'],
+          p99: lat['p(99)'],
+          maxima: lat.max,
+        },
+      };
+      return {
+        stdout: '\n===RESUMO-INICIO===\n' + JSON.stringify(resumo, null, 2) + '\n===RESUMO-FIM===\n',
+      };
+    }

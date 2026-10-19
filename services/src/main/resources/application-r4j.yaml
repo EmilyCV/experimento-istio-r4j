@@ -1,39 +1,38 @@
-# Resilience4j configuration — active only with profile "r4j"
-# Per-try timeout: 500ms (set as HTTP client read timeout)
+# Profile r4j: retry + circuit breaker com Resilience4j na chamada A -> B.
+# Ativo só na variante r4j (SPRING_PROFILES_ACTIVE=service-a,r4j).
+# Os valores equivalentes no Istio estão explicados em PARAMETROS.md.
+
 app:
   http:
+    # Timeout por tentativa: 500 ms (no Istio é o perTryTimeout).
     read-timeout-ms: 500
 
-management:
-  health:
-    circuitbreakers:
-      enabled: true
-
 resilience4j:
-  circuitbreaker:
-    metrics:
-      enabled: true
-    instances:
-      downstream:
-        register-health-indicator: true
-        sliding-window-type: COUNT_BASED
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 30s
-        permitted-number-of-calls-in-half-open-state: 3
-        minimum-number-of-calls: 5
-        record-exceptions:
-          - org.springframework.web.client.HttpServerErrorException
-          - org.springframework.web.client.ResourceAccessException
-          - java.io.IOException
   retry:
-    metrics:
-      enabled: true
     instances:
-      downstream:
+      serviceB:
+        # Tentativas no total, contando a primeira (no Istio: attempts: 2).
         max-attempts: 3
+        # Espera fixa entre tentativas.
         wait-duration: 25ms
+        # Repete só em erro 5xx, timeout ou falha de conexão; nunca em 4xx.
         retry-exceptions:
           - org.springframework.web.client.HttpServerErrorException
           - org.springframework.web.client.ResourceAccessException
-          - java.io.IOException
+
+  circuitbreaker:
+    instances:
+      serviceB:
+        # Janela das últimas 10 chamadas.
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
+        # Abre o circuito com 50% ou mais de falhas na janela.
+        failure-rate-threshold: 50
+        # Fica aberto 30 s antes de testar de novo (meio-aberto).
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        # Contam como falha os mesmos erros que provocam retry.
+        record-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException

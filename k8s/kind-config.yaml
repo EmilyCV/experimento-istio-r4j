@@ -1,0 +1,14 @@
+# Cluster kind com UM único nó (control-plane), para economizar memória.
+#
+# Imagem do nó: Kubernetes 1.31.14, compatível com o Istio 1.24.2
+# (o Istio 1.24 suporta Kubernetes 1.28 a 1.31, segundo
+# https://istio.io/latest/docs/releases/supported-releases/).
+# O digest (@sha256:...) é o publicado nas notas do kind v0.31.0:
+# https://github.com/kubernetes-sigs/kind/releases/tag/v0.31.0
+#
+# Uso: kind create cluster --name exp-cluster --config k8s/kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.31.14@sha256:6f86cf509dbb42767b6e79debc3f2c32e4ee01386f0489b3b2be24b0a55aac2b

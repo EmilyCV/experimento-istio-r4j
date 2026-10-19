@@ -1,0 +1,5 @@
+# Pacotes usados pelo analise.py (versões com que foi testado, em Python 3.11).
+pandas==2.3.3
+scipy==1.16.3
+matplotlib==3.10.0
+numpy==2.3.5

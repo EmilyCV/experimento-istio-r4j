@@ -5,10 +5,11 @@
          https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Spring Boot 3.5.16: última versão da linha 3.x (escolhida em 2026-10-18). -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
 
@@ -16,34 +17,34 @@
     <artifactId>resilience-service</artifactId>
     <version>1.0.0</version>
     <name>resilience-service</name>
-    <description>Single-image microservice for Istio vs Resilience4j experiment</description>
+    <description>Imagem única (service-a e service-b) do experimento Istio x Resilience4j</description>
 
     <properties>
         <java.version>21</java.version>
-        <resilience4j.version>2.2.0</resilience4j.version>
+        <!-- Resilience4j 2.4.0: última versão da linha 2.x. -->
+        <resilience4j.version>2.4.0</resilience4j.version>
     </properties>
 
     <dependencies>
+        <!-- API REST (Tomcat + Spring MVC + RestClient). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Cliente HTTP com pool de conexões, usado pelo RestClient. -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
         </dependency>
 
+        <!-- Health checks (probes do Kubernetes) e endpoints do Resilience4j. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-
+        <!-- Necessário para as anotações @Retry e @CircuitBreaker funcionarem. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
@@ -53,18 +54,6 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-spring-boot3</artifactId>
             <version>${resilience4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.resilience4j</groupId>
-            <artifactId>resilience4j-micrometer</artifactId>
-            <version>${resilience4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

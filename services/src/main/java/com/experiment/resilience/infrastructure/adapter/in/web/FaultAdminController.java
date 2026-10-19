@@ -1,7 +1,8 @@
 package com.experiment.resilience.infrastructure.adapter.in.web;
 
-import com.experiment.resilience.application.usecase.GetPriceUseCase;
+import com.experiment.resilience.application.usecase.ServiceBUseCase;
 import com.experiment.resilience.domain.model.FaultConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,21 +11,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Endpoint administrativo para injetar falhas no service-b.
+ * DESLIGADO por padrão: só existe quando app.fault-admin.enabled=true.
+ * Não é usado no teste sem falhas; fica pronto para um teste futuro.
+ */
 @RestController
-@Profile("service-c")
+@Profile("service-b")
+@ConditionalOnProperty(name = "app.fault-admin.enabled", havingValue = "true")
 public class FaultAdminController {
 
-    private final GetPriceUseCase getPriceUseCase;
+    private final ServiceBUseCase serviceBUseCase;
 
-    public FaultAdminController(GetPriceUseCase getPriceUseCase) {
-        this.getPriceUseCase = getPriceUseCase;
+    public FaultAdminController(ServiceBUseCase serviceBUseCase) {
+        this.serviceBUseCase = serviceBUseCase;
     }
 
     @PostMapping("/admin/fault")
     public Map<String, Object> configureFault(@RequestBody FaultRequest request) {
         if (Boolean.TRUE.equals(request.reset())) {
-            getPriceUseCase.resetFault();
-            return Map.of("status", "reset", "fault", getPriceUseCase.currentFault());
+            serviceBUseCase.resetFault();
+            return Map.of("status", "reset", "fault", serviceBUseCase.currentFault());
         }
 
         FaultConfig config = new FaultConfig(
@@ -34,13 +41,13 @@ public class FaultAdminController {
                 request.errorStatus() != null ? request.errorStatus() : 503,
                 Boolean.TRUE.equals(request.down())
         );
-        getPriceUseCase.configureFault(config);
+        serviceBUseCase.configureFault(config);
         return Map.of("status", "configured", "fault", config);
     }
 
     @GetMapping("/admin/fault")
     public FaultConfig currentFault() {
-        return getPriceUseCase.currentFault();
+        return serviceBUseCase.currentFault();
     }
 
     public record FaultRequest(

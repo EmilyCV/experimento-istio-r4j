@@ -1,0 +1,6 @@
+# Variante r4j: retry + circuit breaker com Resilience4j dentro do service-a, sem sidecar.
+# O prefixo "00-" faz este arquivo ser aplicado primeiro pelo "kubectl apply -f k8s/r4j/".
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: r4j

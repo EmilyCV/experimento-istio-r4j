@@ -1,3 +1,6 @@
+# Configuração comum aos dois serviços e às três variantes.
+# O papel do serviço vem do profile: service-a ou service-b.
+# A variante r4j liga também o profile "r4j" (ver application-r4j.yaml).
 server:
   port: 8080
   shutdown: graceful
@@ -12,23 +15,25 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,prometheus,info,circuitbreakers,circuitbreakerevents,retries,retryevents
+        # health: usado pelas probes do Kubernetes.
+        # retries, circuitbreakers e configprops: para conferir o Resilience4j.
+        include: health,info,retries,circuitbreakers,configprops
   endpoint:
     health:
       probes:
         enabled: true
-      show-details: always
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  metrics:
-    tags:
-      application: ${spring.application.name}
-      service: ${SERVICE_ROLE:unknown}
+    configprops:
+      # Mostra os valores configurados (ex.: max-attempts) em /actuator/configprops.
+      # Aceitável aqui porque a aplicação é sintética e não tem segredos.
+      show-values: always
 
 app:
   http:
     connect-timeout-ms: 500
+    # Maior que o timeout total do Istio (2 s), para não ser a aplicação a cortar a chamada.
     read-timeout-ms: 3000
+  # Duração do trabalho de CPU do service-b, em milissegundos.
   cpu-work-ms: 5
+  # Endpoint de injeção de falhas do service-b (desligado no teste sem falhas).
+  fault-admin:
+    enabled: false

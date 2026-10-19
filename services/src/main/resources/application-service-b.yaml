@@ -1,7 +1,4 @@
+# Profile service-b: expõe GET /api/b/{id}, faz o trabalho de CPU e responde.
 spring:
   application:
     name: service-b
-
-app:
-  price-service:
-    url: ${APP_PRICE_SERVICE_URL:http://localhost:8082}

@@ -1,0 +1,21 @@
+# DestinationRule: CIRCUIT BREAKER (outlier detection) das chamadas ao service-b.
+# O sidecar do service-a observa cada instância (pod) do service-b e tira
+# do balanceamento a que falhar demais. Diferenças em relação ao Resilience4j:
+# ver PARAMETROS.md.
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: service-b
+  namespace: istio
+spec:
+  host: service-b
+  trafficPolicy:
+    outlierDetection:
+      # 5 erros 5xx seguidos tiram a instância do balanceamento.
+      consecutive5xxErrors: 5
+      # De quanto em quanto tempo o Envoy faz essa análise.
+      interval: 10s
+      # Tempo fora do balanceamento (equivale ao "30 s aberto").
+      baseEjectionTime: 30s
+      # Permite tirar 100% das instâncias (temos só uma réplica).
+      maxEjectionPercent: 100

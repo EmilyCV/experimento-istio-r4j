@@ -1,0 +1,11 @@
+# Variante istio: retry + circuit breaker no Istio, com sidecar nos dois serviços.
+# O rótulo istio-injection=enabled faz o Istio colocar um container "istio-proxy"
+# (Envoy) em cada pod criado neste namespace.
+# O mTLS fica no padrão do Istio (PERMISSIVE): entre dois sidecars o tráfego é
+# criptografado automaticamente; isso faz parte do custo medido do sidecar.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio
+  labels:
+    istio-injection: enabled

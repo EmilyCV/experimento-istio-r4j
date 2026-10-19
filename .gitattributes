@@ -1,0 +1,3 @@
+# Scripts de shell sempre com quebra de linha do Linux (LF);
+# com CRLF (padrão do Windows) o bash falha ao executá-los.
+*.sh text eol=lf

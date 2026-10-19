@@ -1,0 +1,64 @@
+# service-a: responde GET /api/a/{id} chamando o service-b.
+# O código não tem resiliência (profile só "service-a"); o retry e o
+# circuit breaker ficam no sidecar do Istio (ver virtual-service.yaml e
+# destination-rule.yaml). O sidecar é injetado porque o namespace tem
+# o rótulo istio-injection=enabled.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-a
+  namespace: istio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-a
+  template:
+    metadata:
+      labels:
+        app: service-a
+    spec:
+      containers:
+        - name: app
+          image: resilience-service:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            # Só "service-a": usa o adapter de chamada HTTP simples.
+            - name: SPRING_PROFILES_ACTIVE
+              value: "service-a"
+            - name: APP_SERVICE_B_URL
+              value: "http://service-b:8080"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-a
+  namespace: istio
+spec:
+  selector:
+    app: service-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
