@@ -1,6 +1,6 @@
 # Profile r4j: retry + circuit breaker com Resilience4j na chamada A -> B.
 # Ativo só na variante r4j (SPRING_PROFILES_ACTIVE=service-a,r4j).
-# Os valores equivalentes no Istio estão explicados em PARAMETROS.md.
+# Os valores correspondentes no Istio estão explicados em PARAMETROS.md.
 
 app:
   http:

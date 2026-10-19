@@ -47,7 +47,7 @@ O gerador de carga é o **k6**. Ele roda dentro do cluster, sem sidecar, e envia
 
 > **Importante:** o cenário **não tem falhas**: o service-b sempre responde 200. Por isso o retry e o circuit breaker **nunca são acionados**. O experimento mede **o custo de ter a resiliência configurada**: o sidecar no caminho da requisição contra a biblioteca dentro da aplicação. Não mede a resiliência em ação.
 
-As hipóteses e o teste estatístico estão em [`HIPOTESES.md`](HIPOTESES.md). Os parâmetros de resiliência equivalentes estão em [`PARAMETROS.md`](PARAMETROS.md). A modificabilidade é medida à parte, pelo [`ROTEIRO-MODIFICABILIDADE.md`](ROTEIRO-MODIFICABILIDADE.md).
+As hipóteses e o teste estatístico estão em [`HIPOTESES.md`](HIPOTESES.md). Os parâmetros de resiliência correspondentes estão em [`PARAMETROS.md`](PARAMETROS.md). A modificabilidade é medida à parte, pelo [`ROTEIRO-MODIFICABILIDADE.md`](ROTEIRO-MODIFICABILIDADE.md).
 
 ---
 

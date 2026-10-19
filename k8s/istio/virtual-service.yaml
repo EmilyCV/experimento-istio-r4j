@@ -1,6 +1,6 @@
 # VirtualService: RETRY e TIMEOUT das chamadas ao service-b.
 # Quem aplica é o sidecar do service-a (o lado que faz a chamada).
-# Equivalência com o Resilience4j: ver PARAMETROS.md.
+# Parâmetros correspondentes no Resilience4j: ver PARAMETROS.md.
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
