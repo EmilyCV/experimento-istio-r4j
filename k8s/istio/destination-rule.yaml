@@ -15,7 +15,7 @@ spec:
       consecutive5xxErrors: 5
       # De quanto em quanto tempo o Envoy faz essa análise.
       interval: 10s
-      # Tempo fora do balanceamento (equivale ao "30 s aberto").
+      # Tempo fora do balanceamento (corresponde aos "30 s aberto" do Resilience4j).
       baseEjectionTime: 30s
       # Permite tirar 100% das instâncias (temos só uma réplica).
       maxEjectionPercent: 100
