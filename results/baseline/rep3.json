@@ -1,0 +1,18 @@
+{
+  "variante": "baseline",
+  "rotulo": "rep3",
+  "taxa_alvo_rps": 20,
+  "duracao": "90s",
+  "requisicoes": 1800,
+  "taxa_real_rps": 20.000644741006102,
+  "taxa_sucesso": 1,
+  "iteracoes_descartadas": 0,
+  "latencia_ms": {
+    "media": 6.778284235000006,
+    "minima": 6.258177,
+    "p50": 6.6978124999999995,
+    "p95": 7.307488149999999,
+    "p99": 8.12355625,
+    "maxima": 18.701824
+  }
+}

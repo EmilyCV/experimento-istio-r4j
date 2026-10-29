@@ -1,0 +1,18 @@
+{
+  "variante": "istio",
+  "rotulo": "rep6",
+  "taxa_alvo_rps": 20,
+  "duracao": "90s",
+  "requisicoes": 1801,
+  "taxa_real_rps": 20.009891857930814,
+  "taxa_sucesso": 1,
+  "iteracoes_descartadas": 0,
+  "latencia_ms": {
+    "media": 7.779971847307058,
+    "minima": 7.24269,
+    "p50": 7.686495,
+    "p95": 8.312457,
+    "p99": 9.103265,
+    "maxima": 43.963189
+  }
+}

@@ -1,0 +1,8 @@
+variante=istio
+repeticoes=10
+duracao_s=90
+taxa_rps=20
+aquecimento_s=30
+intervalo_coleta_s=15
+inicio=2026-10-28 20:40:35
+fim=2026-10-28 20:58:49

@@ -1,0 +1,18 @@
+{
+  "variante": "r4j",
+  "rotulo": "rep2",
+  "taxa_alvo_rps": 20,
+  "duracao": "90s",
+  "requisicoes": 1801,
+  "taxa_real_rps": 20.010322328884303,
+  "taxa_sucesso": 1,
+  "iteracoes_descartadas": 0,
+  "latencia_ms": {
+    "media": 7.017953134369798,
+    "minima": 6.525002,
+    "p50": 6.933868,
+    "p95": 7.458579,
+    "p99": 8.31072,
+    "maxima": 24.464993
+  }
+}
